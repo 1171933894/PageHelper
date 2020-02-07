@@ -66,7 +66,7 @@ public class Page<E> extends ArrayList<E> {
      */
     private boolean count = true;
     /**
-     * 分页合理化
+     * 分页合理化，比如修改起始页0为1
      */
     private Boolean reasonable;
     /**
