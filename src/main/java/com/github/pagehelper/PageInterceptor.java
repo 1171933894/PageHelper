@@ -46,12 +46,17 @@ import java.util.Properties;
  * Mybatis - 通用分页拦截器<br/>
  * 项目地址 : http://git.oschina.net/free/Mybatis_PageHelper
  *
+ * 通过该自定义拦截器并在其中拦截Executor.query(MappedStatement,Object,RowBounds,ResultHandler,CacheKey,BoundSql)
+ * 方法或Executor.query(MappedStatement,Object,RowBounds,ResultHandler)方法。在拦截的Executor.query()方法中，可以
+ * 通过RowBounds参数获取所需记录的起止位置，通过BoundSql参数获取待执行的SQL语句，这样就可以在SQL语句中合适的位置添加“limit offset,length”
+ * 片段，实现分页功能。
+ *
  * @author liuzh/abel533/isea533
  * @version 5.0.0
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Intercepts(
-    {
+    {   // 需要拦截的类/方法/入参
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
     }
@@ -59,16 +64,22 @@ import java.util.Properties;
 public class PageInterceptor implements Interceptor {
     //缓存count查询的ms
     protected Cache<CacheKey, MappedStatement> msCountMap = null;
+    //Dialect对象。每种数据库产品对象
     private Dialect dialect;
     private String default_dialect_class = "com.github.pagehelper.PageHelper";
-    private Field additionalParametersField;
+    private Field additionalParametersField;// additional：额外
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         try {
+            // 从Invocation对象中获取被拦截的方法的参数列表，这里就是
+            // Executor.query(MappedStatement,Object,RowBounds,ResultHandler)的参数列表
             Object[] args = invocation.getArgs();
+            // 获取MappedStatement对象
             MappedStatement ms = (MappedStatement) args[0];
+            // 获取用户传入的实参对象
             Object parameter = args[1];
+            // 获取RowBounds对象
             RowBounds rowBounds = (RowBounds) args[2];
             ResultHandler resultHandler = (ResultHandler) args[3];
             Executor executor = (Executor) invocation.getTarget();
