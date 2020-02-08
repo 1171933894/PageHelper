@@ -31,7 +31,7 @@ import java.lang.reflect.Constructor;
 import java.util.Properties;
 
 /**
- * CacheFactory
+ * CacheFactory 抽象工厂类
  *
  * @author liuzh
  */
