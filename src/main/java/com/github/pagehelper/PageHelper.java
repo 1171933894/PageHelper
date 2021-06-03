@@ -46,7 +46,7 @@ import java.util.Properties;
  * @version 5.0.0
  */
 public class PageHelper extends PageMethod implements Dialect {
-    private PageParams pageParams;
+    private PageParams pageParams;// 主要是properties文件中获取的属性
     private PageAutoDialect autoDialect;
 
     @Override
@@ -54,6 +54,12 @@ public class PageHelper extends PageMethod implements Dialect {
         if(ms.getId().endsWith(MSUtils.COUNT)){
             throw new RuntimeException("在系统中发现了多个分页插件，请检查系统配置!");
         }
+        /**
+         * 从三个地方获取分页信息：
+         * 1）ServletRequest
+         * 2）RowBound
+         * 3）程序调用startPage方法
+         */
         Page page = pageParams.getPage(parameterObject, rowBounds);
         if (page == null) {
             return true;
@@ -119,7 +125,7 @@ public class PageHelper extends PageMethod implements Dialect {
             delegate.afterAll();
             autoDialect.clearDelegate();
         }
-        clearPage();
+        clearPage();// 移除Local变量
     }
 
     @Override

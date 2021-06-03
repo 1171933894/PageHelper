@@ -52,6 +52,7 @@ public class MetaObjectUtil {
 
     public static MetaObject forObject(Object object) {
         try {
+            // 调用静态方法时，obj参数直接传null
             return (MetaObject) method.invoke(null, object);
         } catch (Exception e) {
             throw new PageException(e);
